@@ -6,32 +6,32 @@ import Input from "./Input";
 import Select from "./Select";
 import roleOptions from "../utils/roleOptions";
 
-function onSubmit(e, state, setState, history) {
+function onSubmit(e, employee, setEmployee, history) {
   e.preventDefault();
   const empData = {
-    firstName: state.firstName,
-    lastName: state.lastName,
-    hireDate: state.hireDate,
-    role: state.role
+    firstName: employee.firstName,
+    lastName: employee.lastName,
+    hireDate: employee.hireDate,
+    role: employee.role
   };
 
   axios
     .post("/api/employees", empData)
     .then(() => history.push("/"))
     .catch(err =>
-      setState({
-        ...state,
+      setEmployee({
+        ...employee,
         errors: err.response.data.errors
       })
     );
 }
 
-function onChange(e, state, setState) {
-  setState({ ...state, [e.target.name]: e.target.value });
+function onChange(e, employee, setEmployee) {
+  setEmployee({ ...employee, [e.target.name]: e.target.value });
 }
 
 export default function CreateEmployee(props) {
-  const [state, setState] = useState({
+  const [employee, setEmployee] = useState({
     firstName: "",
     lastName: "",
     hireDate: "",
@@ -49,38 +49,38 @@ export default function CreateEmployee(props) {
               Back
             </Link>
             <h1 className="display-4 text-center">Create Employee</h1>
-            <form onSubmit={e => onSubmit(e, state, setState, history)}>
+            <form onSubmit={e => onSubmit(e, employee, setEmployee, history)}>
               <h6>First Name</h6>
               <Input
                 name="firstName"
-                value={state.firstName}
-                onChange={e => onChange(e, state, setState)}
-                error={state.errors.firstName}
+                value={employee.firstName}
+                onChange={e => onChange(e, employee, setEmployee)}
+                error={employee.errors.firstName}
                 required={true}
               />
               <h6>Last Name</h6>
               <Input
                 name="lastName"
-                value={state.lastName}
-                onChange={e => onChange(e, state, setState)}
-                error={state.errors.lastName}
+                value={employee.lastName}
+                onChange={e => onChange(e, employee, setEmployee)}
+                error={employee.errors.lastName}
                 required={true}
               />
               <h6>Hire Date</h6>
               <Input
                 type="date"
                 name="hireDate"
-                value={state.hireDate}
-                onChange={e => onChange(e, state, setState)}
-                error={state.errors.hireDate}
+                value={employee.hireDate}
+                onChange={e => onChange(e, employee, setEmployee)}
+                error={employee.errors.hireDate}
                 required={true}
               />
               <h6>Role</h6>
               <Select
                 name="role"
-                value={state.role}
-                onChange={e => onChange(e, state, setState)}
-                error={state.errors.role}
+                value={employee.role}
+                onChange={e => onChange(e, employee, setEmployee)}
+                error={employee.errors.role}
                 options={roleOptions}
               />
               <input

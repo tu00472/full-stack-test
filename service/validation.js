@@ -1,7 +1,5 @@
 "use strict";
 
-const validator = require("validator");
-
 const empty = val =>
   !val ||
   (typeof val === "object" && Object.keys(val).length === 0) ||
