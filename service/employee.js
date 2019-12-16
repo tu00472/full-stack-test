@@ -14,7 +14,7 @@ const DATABASE = {};
 /**
  * Return all current records
  */
-router.get("", function(req, res) {
+router.get("", function (req, res) {
   return res.send(Object.values(DATABASE));
 });
 
@@ -34,8 +34,8 @@ router.get("/:id", (req, res) => {
  * Create a new record using a randomly generated value as the unique identifier (i.e. _id field).
  */
 router.post("", (req, res) => {
-  const employee = {};
-  if (populateEmployee(employee, req, res)) {
+  const employee = populateEmployee(req, res);
+  if (employee) {
     employee._id = uuid();
 
     fetchQuoteAndJoke()
@@ -65,9 +65,14 @@ router.delete("/:id", (req, res) => {
  * Replace the record corresponding to :id with the contents of the PUT body
  */
 router.put("/:id", (req, res) => {
-  const employee = DATABASE[req.params.id];
-  if (employee) {
-    if (populateEmployee(employee, req, res)) {
+  const existing = DATABASE[req.params.id];
+  if (existing) {
+    const employee = populateEmployee(req, res);
+    if (employee) {
+      employee._id = req.params.id;
+      employee.quote = existing.quote;
+      employee.joke = existing.joke;
+      DATABASE[req.params.id] = employee;
       res.json(employee);
     }
   } else {
@@ -92,34 +97,37 @@ async function fetchQuoteAndJoke() {
 }
 
 /**
- * Shared code for creating/updating an employee object from request data,
+ * Shared code for creating an employee object from request data,
  * and returning error responses if necessary.
  *
- * Returns true if successful, false otherwise.
+ * Returns the modified employee if successful, null otherwise.
  */
-function populateEmployee(employee, req, res) {
+function populateEmployee(req, res) {
   const errors = validate(req.body);
 
   if (Object.keys(errors).length) {
     res.status(400).json({ errors });
-    return false;
+    return null;
   }
 
-  employee.firstName = req.body.firstName.trim();
-  employee.lastName = req.body.lastName.trim();
-  employee.role = req.body.role.trim();
-  employee.hireDate = new Date(req.body.hireDate);
+  const employee = {
+    firstName: req.body.firstName.trim(),
+    lastName: req.body.lastName.trim(),
+    role: req.body.role.trim(),
+    hireDate: new Date(req.body.hireDate)
+  };
 
   if (employee.role === "CEO") {
     // If employee is new, or is not currently the existing CEO, throw an error.
     const existingCEO = Object.values(DATABASE).find(emp => emp.role === "CEO");
-    if (existingCEO && existingCEO._id !== employee._id) {
+
+    if (existingCEO && existingCEO._id !== req.params.id) {
       res.status(400).json({ errors: { role: "A CEO already exists." } });
-      return false;
+      return null;
     }
   }
 
-  return true;
+  return employee;
 }
 
 module.exports = router;
