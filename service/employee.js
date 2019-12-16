@@ -14,9 +14,7 @@ const DATABASE = {};
 /**
  * Return all current records
  */
-router.get("", function (req, res) {
-  return res.send(Object.values(DATABASE));
-});
+router.get("", (req, res) => res.send(Object.values(DATABASE)));
 
 /**
  * Return the record corresponding to the id parameter
@@ -100,7 +98,7 @@ async function fetchQuoteAndJoke() {
  * Shared code for creating an employee object from request data,
  * and returning error responses if necessary.
  *
- * Returns the modified employee if successful, null otherwise.
+ * Returns the new employee if successful, null otherwise.
  */
 function populateEmployee(req, res) {
   const errors = validate(req.body);
@@ -120,7 +118,6 @@ function populateEmployee(req, res) {
   if (employee.role === "CEO") {
     // If employee is new, or is not currently the existing CEO, throw an error.
     const existingCEO = Object.values(DATABASE).find(emp => emp.role === "CEO");
-
     if (existingCEO && existingCEO._id !== req.params.id) {
       res.status(400).json({ errors: { role: "A CEO already exists." } });
       return null;
