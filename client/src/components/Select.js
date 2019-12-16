@@ -1,7 +1,7 @@
 import React from "react";
 import classnames from "classnames";
 
-export default function SelectListGroup(props) {
+export default function Select(props) {
   const optionElements = props.options.map(option => (
     <option key={option.label} value={option.value}>
       {option.label}
